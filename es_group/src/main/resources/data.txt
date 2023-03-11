@@ -1,0 +1,568 @@
+#电视案例
+PUT /tvs
+PUT /tvs/_mapping
+{
+    "properties": {
+        "price": {
+            "type": "long"
+        },
+        "color": {
+            "type": "keyword"
+        },
+        "brand": {
+            "type": "keyword"
+        },
+        "sold_date": {
+            "type": "date"
+        }
+    }
+}
+
+POST /tvs/_bulk
+{ "index": {}}
+{ "price" : 1000, "color" : "红色", "brand" : "长虹", "sold_date" : "2019-10-28" }
+{ "index": {}}
+{ "price" : 2000, "color" : "红色", "brand" : "长虹", "sold_date" : "2019-11-05" }
+{ "index": {}}
+{ "price" : 3000, "color" : "绿色", "brand" : "小米", "sold_date" : "2019-05-18" }
+{ "index": {}}
+{ "price" : 1500, "color" : "蓝色", "brand" : "TCL", "sold_date" : "2019-07-02" }
+{ "index": {}}
+{ "price" : 1200, "color" : "绿色", "brand" : "TCL", "sold_date" : "2019-08-19" }
+{ "index": {}}
+{ "price" : 2000, "color" : "红色", "brand" : "长虹", "sold_date" : "2019-11-05" }
+{ "index": {}}
+{ "price" : 8000, "color" : "红色", "brand" : "三星", "sold_date" : "2020-01-01" }
+{ "index": {}}
+{ "price" : 2500, "color" : "蓝色", "brand" : "小米", "sold_date" : "2020-02-12" }
+
+#统计哪种颜色的电视效率最高
+GET /tvs/_search
+{
+  "query": {
+    "match_all": {}
+  },
+  "aggs": {
+    "groupby_color": {
+      "terms": {
+        "field": "color"
+      }
+    }
+  }
+}
+
+#统计每种颜色电视平均价格
+GET /tvs/_search
+{
+  "query": {
+    "match_all": {}
+  },
+  "aggs": {
+    "groupby_color": {
+      "terms": {
+        "field": "color"
+      },
+      "aggs": {
+        "groupby_avg": {
+          "avg": {
+            "field": "price"
+          }
+        }
+      }
+    }
+  }
+}
+
+#统计每种颜色电视,每种品牌的平均价格
+GET /tvs/_search
+{
+  "size": 0,
+  "query": {
+    "match_all": {}
+  },
+  "aggs": {
+    "groupby_color": {
+      "terms": {
+        "field": "color"
+      },
+      "aggs": {
+        "groupby_avg": {
+          "avg": {
+            "field": "price"
+          }
+        },
+        "group_brand":{
+          "terms": {
+            "field": "brand"
+          },
+          "aggs": {
+            "brand_avg_price": {
+              "avg": {
+                "field": "price"
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
+
+#求每个颜色的销售数量、平均价格、最大价格、最小价格、价格总和
+GET /tvs/_search
+{
+  "size": 0,
+  "query": {
+    "match_all": {}
+  },
+  "aggs": {
+    "groupby_color": {
+      "terms": {
+        "field": "color"
+      },
+      "aggs": {
+        "avg_price": {
+          "avg": {
+            "field": "price"
+          }
+        },
+        "max_price":{
+          "max": {
+            "field": "price"
+          }
+        },
+        "min_price":{
+          "min": {
+            "field": "price"
+          }
+        },
+        "sum_price":{
+          "sum": {
+            "field": "price"
+          }
+        }
+      }
+    }
+  }
+}
+
+#求出价格每2000为一个区间，求区间的销售总额
+GET /tvs/_search
+{
+  "size": 0,
+  "query": {
+    "match_all": {}
+  },
+  "aggs": {
+    "price_histogram":{
+      "histogram": {
+        "field": "price",
+        "interval": 2000
+      },
+      "aggs": {
+        "income":{
+      "sum": {
+        "field": "price"
+      }
+    }
+      }
+    }
+
+  }
+}
+
+#求每个月的销售额
+GET /tvs/_search
+{
+   "size" : 0,
+   "aggs": {
+      "sales": {
+         "date_histogram": {
+            "field": "sold_date",
+            "interval": "month",
+            "format": "yyyy-MM-dd",
+            "min_doc_count" : 0,
+            "extended_bounds" : {
+                "min" : "2019-01-01",
+                "max" : "2020-12-31"
+            }
+         }
+      }
+   }
+}
+
+
+
+#求每个季度，每个品牌的销售额，每个季度的销售总额
+GET /tvs/_search
+{
+   "size" : 0,
+   "aggs": {
+      "sales": {
+         "date_histogram": {
+            "field": "sold_date",
+            "interval": "quarter",
+            "format": "yyyy-MM-dd",
+            "min_doc_count" : 0,
+            "extended_bounds" : {
+                "min" : "2019-01-01",
+                "max" : "2020-12-31"
+            }
+         },
+         "aggs": {
+           "brand": {
+             "terms": {
+               "field": "brand"
+             },
+             "aggs": {
+               "brand_sale": {
+                 "sum": {
+                   "field": "price"
+                  }
+               }
+             }
+           },
+           "quarter_sale":{
+             "sum": {
+               "field": "price"
+             }
+           }
+         }
+      }
+   }
+}
+
+GET /tvs/_search
+{
+  "size": 0,
+  "query": {
+    "term": {
+      "brand": {
+        "value": "小米"
+      }
+    }
+  },
+  "aggs": {
+    "group_by_color": {
+      "terms": {
+        "field": "color"
+      }
+    }
+  }
+}
+
+GET /tvs/_search
+{
+  "size": 0,
+  "query": {
+    "term": {
+      "brand": {
+        "value": "小米"
+      }
+    }
+  },
+  "aggs": {
+    "single_brand_avg_price": {
+      "avg": {
+        "field": "price"
+      }
+    },
+    "all": {
+      "global": {},
+      "aggs": {
+        "all_brand_avg_price": {
+          "avg": {
+            "field": "price"
+          }
+        }
+      }
+    }
+  }
+}
+
+#统计价格大于1200的电视平均价格
+GET /tvs/_search
+{
+  "size": 0,
+  "query": {
+    "constant_score": {
+      "filter": {
+        "range": {
+          "price": {
+            "gte": 1200
+          }
+        }
+      }
+    }
+  },
+  "aggs": {
+    "avg_price": {
+      "avg": {
+        "field": "price"
+      }
+    }
+  }
+}
+
+
+GET /tvs/_search
+{
+  "size": 0,
+  "query": {
+    "term": {
+      "brand": {
+        "value": "小米"
+      }
+    }
+  },
+  "aggs": {
+    "recent_150d": {
+      "filter": {
+        "range": {
+          "sold_date": {
+            "gte": "now-150d"
+          }
+        }
+      },
+      "aggs": {
+        "recent_150d_avg_price": {
+          "avg": {
+            "field": "price"
+          }
+        }
+      }
+    },
+    "recent_140d": {
+      "filter": {
+        "range": {
+          "sold_date": {
+            "gte": "now-140d"
+          }
+        }
+      },
+      "aggs": {
+        "recent_140d_avg_price": {
+          "avg": {
+            "field": "price"
+          }
+        }
+      }
+    },
+    "recent_130d": {
+      "filter": {
+        "range": {
+          "sold_date": {
+            "gte": "now-130d"
+          }
+        }
+      },
+      "aggs": {
+        "recent_130d_avg_price": {
+          "avg": {
+            "field": "price"
+          }
+        }
+      }
+    },
+    "recent_2nian": {
+      "filter": {
+        "range": {
+          "sold_date": {
+            "gte": "now-720d"
+          }
+        }
+      },
+      "aggs": {
+        "recent_130d_avg_price": {
+          "avg": {
+            "field": "price"
+          }
+        }
+      }
+    }
+  }
+}
+
+#按每种颜色的平均销售额降序排序(父层聚合可以使用子层聚合)
+GET /tvs/_search
+{
+  "size": 0,
+  "aggs": {
+    "group_by_color": {
+      "terms": {
+        "field": "color",
+        "order": {
+          "avg_price": "asc"
+        }
+      },
+      "aggs": {
+        "avg_price": {
+          "avg": {
+            "field": "price"
+          }
+        }
+      }
+    }
+  }
+}
+
+#按每种颜色的每种品牌平均销售额降序排序
+GET /tvs/_search
+{
+  "size": 0,
+  "aggs": {
+    "group_by_color": {
+      "terms": {
+        "field": "color"
+      },
+      "aggs": {
+        "group_by_brand": {
+          "terms": {
+            "field": "brand",
+            "order": {
+              "avg_price": "desc"
+            }
+          },
+          "aggs": {
+            "avg_price": {
+              "avg": {
+                "field": "price"
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
+
+#需求一：按照颜色分组，计算每个颜色卖出的个数
+GET /tvs/_search
+{
+  "size": 0,
+  "query": {
+    "match_all": {}
+  },
+  "aggs": {
+    "groupby_color": {
+      "terms": {
+        "field": "color"
+      }
+    }
+  }
+}
+
+#需求二：按照颜色分组，计算每个颜色卖出的个数,每个颜色卖出的平均价格
+GET /tvs/_search
+{
+  "size": 0,
+  "query": {
+    "match_all": {}
+  },
+  "aggs": {
+    "groupby_color": {
+      "terms": {
+        "field": "color"
+      },
+      "aggs": {
+        "avg_price":{
+          "avg": {
+            "field": "price"
+          }
+        }
+      }
+    }
+  }
+}
+
+#需求三：按照颜色分组，计算每个颜色卖出的个数,每个颜色卖出的平均价格、最大价格、最小价格、总价格
+GET /tvs/_search
+{
+  "size": 0,
+  "query": {
+    "match_all": {}
+  },
+  "aggs": {
+    "numbers": {
+      "terms": {
+        "field": "color"
+      },
+      "aggs": {
+        "avg_price":{
+          "avg": {
+            "field": "price"
+          }
+        },
+        "max_price":{
+          "max": {
+            "field": "price"
+          }
+        },
+        "min_price":{
+          "min": {
+            "field": "price"
+          }
+        },
+        "total":{
+          "sum": {
+            "field": "price"
+          }
+        }
+      }
+    }
+  }
+}
+
+#需求四：按照售价每2000元划分范围，算出每个区间的销售总额 histogram
+GET /tvs/_search
+{
+  "size": 0,
+  "query": {
+    "match_all": {}
+  },
+  "aggs": {
+    "price_range":{
+      "histogram": {
+        "field": "price",
+        "interval": 2000
+      },
+      "aggs": {
+        "sale": {
+          "sum": {
+            "field": "price"
+          }
+        }
+      }
+    }
+  }
+}
+
+#需求五：计算每个季度的销售总额 histogram
+GET /tvs/_search
+{
+  "size": 0,
+  "query": {
+    "match_all": {}
+  },
+  "aggs": {
+    "sales":{
+      "date_histogram": {
+        "field": "sold_date",
+        "interval": "quarter",
+        "format": "yyyy-MM-dd",
+        "min_doc_count": 0,
+        "extended_bounds": {
+          "min": "2019-01-01",
+          "max": "2020-12-31"
+        }
+      },
+      "aggs": {
+        "income": {
+          "sum": {
+            "field": "price"
+          }
+        }
+      }
+    }
+  }
+}

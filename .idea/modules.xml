@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ProjectModuleManager">
+    <modules>
+      <module fileurl="file://$PROJECT_DIR$/es_document/es_document.iml" filepath="$PROJECT_DIR$/es_document/es_document.iml" />
+      <module fileurl="file://$PROJECT_DIR$/es_group/es_group.iml" filepath="$PROJECT_DIR$/es_group/es_group.iml" />
+      <module fileurl="file://$PROJECT_DIR$/es_index/es_index.iml" filepath="$PROJECT_DIR$/es_index/es_index.iml" />
+      <module fileurl="file://$PROJECT_DIR$/es_search/es_search.iml" filepath="$PROJECT_DIR$/es_search/es_search.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/study_elk.iml" filepath="$PROJECT_DIR$/.idea/study_elk.iml" />
+    </modules>
+  </component>
+</project>
