@@ -1,0 +1,9 @@
+# 应用名称
+spring:
+  application:
+    name: search-service
+qxy:
+  elasticsearch:
+    hostList: 127.0.0.1:9200
+
+
