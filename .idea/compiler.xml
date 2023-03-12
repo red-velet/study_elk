@@ -8,6 +8,7 @@
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
         <module name="es_search" />
+        <module name="elk_combat" />
         <module name="es_index" />
         <module name="es_document" />
         <module name="es_group" />
@@ -15,6 +16,7 @@
     </annotationProcessing>
     <bytecodeTargetLevel>
       <module name="demo" target="1.8" />
+      <module name="elk_combat" target="1.8" />
       <module name="es_document" target="1.8" />
       <module name="es_group" target="1.8" />
       <module name="es_index" target="1.8" />
@@ -24,6 +26,7 @@
   <component name="JavacSettings">
     <option name="ADDITIONAL_OPTIONS_OVERRIDE">
       <module name="demo" options="-parameters" />
+      <module name="elk_combat" options="-parameters" />
       <module name="es_document" options="-parameters" />
       <module name="es_group" options="-parameters" />
       <module name="es_index" options="-parameters" />

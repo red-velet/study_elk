@@ -1,0 +1,18 @@
+# 应用名称
+spring:
+  application:
+    name: search-service
+qxy:
+  elasticsearch:
+    hostList: 127.0.0.1:9200
+logging:
+  config: classpath:logback-spring.xml
+  level:
+    root: info
+  file:
+    path: C:/Users/SayHello/Desktop/log
+
+
+
+
+

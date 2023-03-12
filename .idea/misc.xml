@@ -7,6 +7,7 @@
         <option value="$PROJECT_DIR$/es_index/pom.xml" />
         <option value="$PROJECT_DIR$/es_search/pom.xml" />
         <option value="$PROJECT_DIR$/es_group/pom.xml" />
+        <option value="$PROJECT_DIR$/elk_combat/pom.xml" />
       </list>
     </option>
   </component>
